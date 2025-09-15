@@ -238,8 +238,120 @@ cd WiringPi
 ```bash
 gpio -v
 ```
+#### 3.3 Работа с датчиком температуры и влажности
+Для работы с датчиком температуры и влажности в ROS Noetic используем пакет rosserial_mbed.
+Для установки выполним следующие действия:
+1. перейдем в папку src
+```bash 
+cd ~/catkin_ws/src
+```
+2. Выполним клонирование  репозитория 
+```bash 
+git clone https://github.com/ros-drivers/rosserial.git
+```
 
+3.  Выполним сборку библиотеки
+```bash
+cd ~/catkin_ws
+catkin_make
+source devel/setup.bash
+```
+4. Выполним генерацию ros_lib
+```bash
+rosrun rosserial_mbed make_libraries.py ~/ros/lib
+```
+5. Выполним установку переменных окружения
+```bash
+export GCC4MBED_DIR=~/gcc4mbed
+export ROS_LIB_DIR=~/ros/lib/ros_lib
+```
 
+####  3.4 Создание ROS пакета для USB камеры в ROS Noetic
+
+1. Выполним установку пакета usb_cam через терминал:
+```bash
+sudo apt-get install ros-noetic-usb-cam
+```
+Шаг 2: Создание launch файла
+
+    Создайте новый launch файл (например, usb_cam_test.launch) в директории launch вашего пакета:
+
+xml
+
+<launch>
+    <node name="usb_cam" pkg="usb_cam" type="usb_cam_node" output="screen">
+        <param name="video_device" value="/dev/video0"/>
+        <param name="image_width" value="640"/>
+        <param name="image_height" value="480"/>
+        <param name="pixel_format" value="yuyv"/>
+        <param name="camera_frame_id" value="usb_cam"/>
+    </node>
+</launch>
+
+Шаг 3: Запуск камеры
+
+    Запустите узел камеры:
+
+bash
+
+roslaunch your_package_name usb_cam_test.launch
+
+Работа с несколькими камерами
+
+Если необходимо использовать несколько камер, создайте launch файл следующего вида:
+xml
+
+<launch>
+    <node name="usb_cam1" pkg="usb_cam" type="usb_cam_node" output="screen">
+        <param name="video_device" value="/dev/video0"/>
+        <param name="image_width" value="640"/>
+        <param name="image_height" value="480"/>
+        <param name="pixel_format" value="yuyv"/>
+        <param name="camera_frame_id" value="usb_cam1"/>
+    </node>
+    
+    <node name="usb_cam2" pkg="usb_cam" type="usb_cam_node" output="screen">
+        <param name="video_device" value="/dev/video1"/>
+        <param name="image_width" value="640"/>
+        <param name="image_height" value="480"/>
+        <param name="pixel_format" value="yuyv"/>
+        <param name="camera_frame_id" value="usb_cam2"/>
+    </node>
+</launch>
+
+Проверка работы камеры
+
+    Запустите rqt_image_view для проверки потока:
+
+bash
+
+rqt_image_view
+
+    Выберите тему /usb_cam/image_raw для просмотра изображения.
+
+Основные параметры конфигурации
+
+    video_device: путь к устройству камеры (обычно /dev/video0)
+
+    image_width: ширина изображения в пикселях
+
+    image_height: высота изображения в пикселях
+
+    pixel_format: формат пикселей (yuyv, mjpeg и др.)
+
+    camera_frame_id: идентификатор кадра камеры
+
+Возможные проблемы
+
+    Если камера не определяется, проверьте:
+
+        Правильно ли указан video_device
+
+        Подключена ли камера
+
+        Есть ли у пользователя права на доступ к устройству
+
+    Если возникают проблемы с форматом изображения, попробуйте изменить параметр pixel_format.
 
 
 #### Литература
