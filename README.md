@@ -315,15 +315,57 @@ sudo ./<путь до папки scripts>/scripts/my_ssh.sh
 ``` 
 
 ### Этап4. Подготовка и сборка пакетов ROS для функционирования робота
+В настоящей работе на робот устанавливаются следующие пакеты и драйверы:
+1. [Драйвер для управления лидаром](https://github.com/Slamtec/rplidar_ros.git)
 
-#### 3.1 Установка пакета ROS для RPLIDAR A1
-Для установки пакета ROS для RLIDAR  A1 необходимо выполнить следующие действия 
-Склонировать репозиторий с помощью команды
+2. [Драйвер для работы с usb-камерой](https://github.com/ros-drivers/usb_cam)
+
+3. [Драйвер для работы с датчиком давления газа ВМЕ688](https://github.com/akchobby/bme688_driver)
+
+4. [Драйвер для работы с энкодерами](https://github.com/hiwad-aziz/ros2_f249_driver)
+
+5. [Драйвер для управления приводом робота](https://github.com/odriverobotics/ros_odrive?tab=readme-ov-file)
+
+6. [Драйвер для датчика температуры  давления BM280](https://github.com/JCorbin406/ros2-bmp280.git)
+
+#### 4.1 Установка пакета ROS для RPLIDAR A1
+Для установки пакета ROS для RLIDAR  A1 необходимо выполнить следующие действия:
+1. Перйдем в папку ```~/ros2_ws/src``` c помощью команды:
+```bash
+cd ~/ros2_ws/src
+```
+2. Склонировать репозиторий с помощью команды:
 ```bash
 git clone https://github.com/Slamtec/rplidar_ros.git
 ```
-Для получения ноды `rplidarNode` и `rplidarNodeClient` необходимо запустить команду 
+
+3. Перейдем в корневую директорию workspace c помощью команды::
+```bash
+cd ~/ros2_ws
+```
+4. Выполним сборку пакета с помощью команды:
+```bash
+source /opt/ros/<ваша_версия_ros>/setup.bash
+colcon build --symlink-install
+```
+
+5. Выполним активацию окружения:
+```bash
+source ./install/setup.bash
+```
+6. Для постоянного добавления в окружение введем команду:
+```bash
+echo "source ~/ros2_ws/install/setup.bash" >> ~/.bashrc
+source ~/.bashrc
+```
+
+Для автоматизации запуска написан скрипт `lidar_install.sh`.
+Листинг представлен ниже 
 ```bash 
+
+
+
+
 catkin_make
 ```  
 Для запуска ноды rplidarNnode  отображения в rviz необходимо запустить команду 
