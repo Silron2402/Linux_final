@@ -316,7 +316,7 @@ sudo ./<путь до папки scripts>/scripts/my_ssh.sh
 
 ### Этап4. Подготовка и сборка пакетов ROS для функционирования робота
 В настоящей работе на робот устанавливаются следующие пакеты и драйверы:
-1. [Драйвер для управления лидаром](https://github.com/Slamtec/rplidar_ros.git)
+1. [Драйвер для управления лидаром](https://github.com/ros-drivers/velodyne)
 
 2. [Драйвер для работы с usb-камерой](https://github.com/ros-drivers/usb_cam)
 
@@ -328,7 +328,7 @@ sudo ./<путь до папки scripts>/scripts/my_ssh.sh
 
 6. [Драйвер для датчика температуры  давления BM280](https://github.com/JCorbin406/ros2-bmp280.git)
 
-#### 4.1 Установка пакета ROS для RPLIDAR A1
+#### 4.1 Установка пакета ROS2 для VeloDyn1RPLIDAR A1
 Для установки пакета ROS для RLIDAR  A1 необходимо выполнить следующие действия:
 1. Перйдем в папку ```~/ros2_ws/src``` c помощью команды:
 ```bash
@@ -336,7 +336,7 @@ cd ~/ros2_ws/src
 ```
 2. Склонировать репозиторий с помощью команды:
 ```bash
-git clone https://github.com/Slamtec/rplidar_ros.git
+git clone https://github.com/ros-drivers/velodyne.git
 ```
 
 3. Перейдем в корневую директорию workspace c помощью команды::
@@ -345,7 +345,7 @@ cd ~/ros2_ws
 ```
 4. Выполним сборку пакета с помощью команды:
 ```bash
-source /opt/ros/<ваша_версия_ros>/setup.bash
+source /opt/ros/iron/setup.bash
 colcon build --symlink-install
 ```
 
@@ -362,21 +362,39 @@ source ~/.bashrc
 Для автоматизации запуска написан скрипт `lidar_install.sh`.
 Листинг представлен ниже 
 ```bash 
+#!bin/bash
 
+# Перeйдем в папку ~/ros2_ws/src
+cd ~/ros2_ws/src
 
+#установка git
+sudo apt install git -y
 
+# Клонирование репозитория с помощью команды:
+git clone https://github.com/ros-drivers/velodyne.git
 
-catkin_make
+# https://github.com/Slamtec/rplidar_ros.git
+
+# Переход в корневую директорию workspace:
+cd ~/ros2_ws
+
+#Выполним сборку пакета с помощью команды:
+source /opt/ros/iron/setup.bash
+
+colcon build --symlink-install
+
+# Выполним активацию окружения:
+source ./install/setup.bash
+
+#Для постоянного добавления в окружение введем команду:
+echo "source ~/ros2_ws/install/setup.bash" >> ~/.bashrc
+source ~/.bashrc
 ```  
-Для запуска ноды rplidarNnode  отображения в rviz необходимо запустить команду 
+
+Перед первым запуском желательно ввести в терминал команду 
 ```bash
-roslaunch rplidar_ros view_rplidar_a1.launch
+chmod +x lidar_install.sh
 ```
-Результат сканирования должен отобразиться в rviz. Для запуска rviz необходимо в вести rviz в новом окне терминала.. Для тестового запуска следует  в окне терминала ввести команду
-```bash
-roslaunch rplidar_ros rplidar_a1.launch 
-```
-Результат сканирования должен быть выведен в терминал. 
 
 #### 3.2 Установка библиотеки WiringPi
 Для использования GPIO-контактов Raspberry Pi установим библиотеку для C++ WiringPi. Для сборки библиотеки выполним клонирование с репозитория с помощью команды в терминале на Raspberry Pi:
