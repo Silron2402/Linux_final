@@ -220,12 +220,14 @@ for pkg in "${required_packages2[@]}"; do
 done
 
 #инициализация rosdep
-log_msg "Инициализация rosdep.."
-if ! rosdep init; then
-    log_msg "Ошибка: rosdep init failed"
-    exit 1    
+if [ ! -f /etc/ros/rosdep/sources.list.d/20-default.list ]; then
+    log_msg "Инициализация rosdep..."
+    rosdep init || { log_msg "rosdep init failed"; exit 1; }
+else
+    log_msg "rosdep уже инициализирован"
 fi
 rosdep update
+
 log_msg "Инициализация rosdep... done"  
 
 #применение изменений из файла .bashrc в текущей сессии терминала без его перезапуска
