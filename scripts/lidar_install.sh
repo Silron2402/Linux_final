@@ -21,7 +21,7 @@ is_package_installed() {
 #Получение имени пользователя и адреса домашнего каталога
 USERNAME=$(whoami)
 #USER_HOME=$(getent passwd "$USERNAME" | cut -d: -f6)
-USER_HOME=$(getent passwd "$SUDO_USER" | cut -d: -f6)  $SUDO_USER
+USER_HOME=$(getent passwd "$SUDO_USER" | cut -d: -f6)
 #USER_2=$(getent passwd "$SUDO_USER" | cut -d: -f6)
 
 # Путь к установочной директории
