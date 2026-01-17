@@ -32,8 +32,6 @@ echo "Рабочий каталог: $PWD"
 echo "Рабочий каталог ros2: $WORKSPACE_DIR"
 echo "Рабочий каталог lidar: $WORK_DIR"
 
-exit 1
-
 #проверка интернет-соединения
 if ! ping -c 1 github.com &> /dev/null; then
     log_msg "Отсутствует интернет‑соединение!"
