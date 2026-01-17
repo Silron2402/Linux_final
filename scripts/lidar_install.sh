@@ -151,6 +151,13 @@ set +u #Отключим проверку обнаружения неопред�
 source ~/.bashrc
 set -u #Включим проверку обнаружения неопределенных переменных
 
+if ! ros2 pkg list | grep -q "rplidar_ros"; then
+    log_msg "ОШИБКА: Пакет rplidar_ros не найден в ROS2!"
+    exit 1
+else
+    log_msg "✓ Пакет rplidar_ros обнаружен в ROS2."
+fi
+
 # 2. Проверка наличия скомпилированных пакетов ROS
 if ! colcon list --base-paths "$WORKSPACE_DIR/src" --packages-select rplidar_ros &>/dev/null; then
     log_msg "ОШИБКА: Пакет rplidar_ros не обнаружен в workspace!"
