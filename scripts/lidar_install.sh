@@ -70,17 +70,14 @@ cd "$WORKSPACE_DIR" || {
     exit 1
 }
 
-# Определение ROS_DISTRO (критическое исправление!)
-if [ -z "$ROS_DISTRO" ]; then
-    # Пытаемся определить дистрибутив по наличию директорий
-    ROS_DISTROS=$(ls /opt/ros 2>/dev/null | tail -1)
-    if [ -n "$ROS_DISTROS" ]; then
-        ROS_DISTRO="$ROS_DISTROS"
-        log_msg "Автоматически определён ROS_DISTRO=$ROS_DISTRO"
-    else
-        log_msg "Ошибка: не удалось определить ROS_DISTRO. Убедитесь, что ROS установлен и sourced."
-        exit 1
-    fi
+# Определение ROS_DISTRO по наличию директорий
+ROS_DISTROS=$(ls /opt/ros 2>/dev/null | tail -1)
+if [ -n "$ROS_DISTROS" ]; then
+    ROS_DISTRO="$ROS_DISTROS"
+    log_msg "Автоматически определён ROS_DISTRO=$ROS_DISTRO"
+else
+    log_msg "Ошибка: не удалось определить ROS_DISTRO. Убедитесь, что ROS установлен и sourced."
+    exit 1
 fi
 
 #Выполним сборку пакета 
