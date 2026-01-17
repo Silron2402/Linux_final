@@ -74,7 +74,7 @@ fi
 #git clone https://github.com/Slamtec/rplidar_ros.git -b ros2
 REPO_URL="https://github.com/Slamtec/rplidar_ros.git"  
 #рабочая директория
-REPO_DIR="$WORKSPACE_DIR/src/slamtec"
+REPO_DIR="$WORKSPACE_DIR/src/rplidar_ros"
 
 
 if [ -d "$REPO_DIR" ]; then
