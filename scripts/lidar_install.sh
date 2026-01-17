@@ -70,8 +70,11 @@ cd "$WORKSPACE_DIR" || {
     exit 1
 }
 
+#ros version
+DFF=$(rosversion -d)
+
 #Выполним сборку пакета с помощью команды:
-source /opt/ros/$ROS_DISTRO/setup.bash
+source /opt/ros/$DFF/setup.bash
 
 
 # Сборка workspace с помощью colcon
