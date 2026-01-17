@@ -71,7 +71,8 @@ done
 
 #Получение имени пользователя и адреса домашнего каталога
 USERNAME=$(whoami)
-USER_HOME=$(getent passwd "$USERNAME" | cut -d: -f6)
+#USER_HOME=$(getent passwd "$USERNAME" | cut -d: -f6)  $SUDO_USER
+USER_HOME=$(getent passwd "$SUDO_USER" | cut -d: -f6)  $SUDO_USER
 # Путь к рабочей директории
 WORKSPACE_DIR="$USER_HOME/ros2_ws"
 

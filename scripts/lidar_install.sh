@@ -20,17 +20,18 @@ is_package_installed() {
 
 #Получение имени пользователя и адреса домашнего каталога
 USERNAME=$(whoami)
-USER_HOME=$(getent passwd "$USERNAME" | cut -d: -f6)
-USER_2=$(getent passwd "$SUDO_USER" | cut -d: -f6)
+#USER_HOME=$(getent passwd "$USERNAME" | cut -d: -f6)
+USER_HOME=$(getent passwd "$SUDO_USER" | cut -d: -f6)  $SUDO_USER
+#USER_2=$(getent passwd "$SUDO_USER" | cut -d: -f6)
 
 # Путь к установочной директории
 WORKSPACE_DIR="$USER_HOME/ros2_ws"
-WORK_DIR="$USER_2/lidar_slamtec"
-echo "Текущий пользователь: $(whoami)"
-echo "Домашний каталог: $HOME"
-echo "Рабочий каталог: $PWD"
-echo "Рабочий каталог ros2: $WORKSPACE_DIR"
-echo "Рабочий каталог lidar: $WORK_DIR"
+#WORK_DIR="$USER_2/lidar_slamtec"
+#cho "Текущий пользователь: $(whoami)"
+#echo "Домашний каталог: $HOME"
+#echo "Рабочий каталог: $PWD"
+#echo "Рабочий каталог ros2: $WORKSPACE_DIR"
+#echo "Рабочий каталог lidar: $WORK_DIR"
 
 #проверка интернет-соединения
 if ! ping -c 1 github.com &> /dev/null; then
@@ -46,18 +47,18 @@ fi
 
 
 # Переход в директорию src рабочего пространства ROS 2
-cd "$WORK_DIR/src" || {
-    log_msg "Ошибка: директория $WORK_DIR/src не найдена!"
-    mkdir -p "$WORK_DIR/src"
-    if ! cd "$WORK_DIR/src"; then
-        log_msg "Ошибка: директория $WORK_DIR/src не была создана!"
+cd "$WORKSPACE_DIR/src" || {
+    log_msg "Ошибка: директория $WORKSPACE_DIR/src не найдена!"
+    mkdir -p "$WORKSPACE_DIR/src"
+    if ! cd "$WORKSPACE_DIR/src"; then
+        log_msg "Ошибка: директория $WORKSPACE_DIR/src не была создана!"
         exit 1
     fi
 }
 
 # Переход в директорию src рабочего пространства ROS 2
-cd "$WORK_DIR/src" || {
-    log_msg "Ошибка: директория $WORK_DIR/src не найдена!"
+cd "$WORKSPACE_DIR/src" || {
+    log_msg "Ошибка: директория $WORKSPACE_DIR/src не найдена!"
     exit 1
 }
 
@@ -73,7 +74,7 @@ fi
 #git clone https://github.com/Slamtec/rplidar_ros.git -b ros2
 REPO_URL="https://github.com/Slamtec/rplidar_ros.git"  
 #рабочая директория
-REPO_DIR="$WORK_DIR/src/slamtec"
+REPO_DIR="$WORKSPACE_DIR/src/slamtec"
 
 
 if [ -d "$REPO_DIR" ]; then
@@ -85,8 +86,8 @@ else
 fi
 
 # Переход в корневую директорию workspace
-cd "$WORK_DIR" || {
-    log_msg "Ошибка: не удалось перейти в $WORK_DIR!"
+cd "$WORKSPACE_DIR" || {
+    log_msg "Ошибка: не удалось перейти в $WORKSPACE_DIR!"
     exit 1
 }
 
