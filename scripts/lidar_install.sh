@@ -121,8 +121,10 @@ else
 fi
 set -u #Включим проверку обнаружения неопределенных переменных
 
+
 # Сборка workspace с помощью colcon
 log_msg "Сборка workspace с colcon..."
+log_msg "Мы находимся в директории $PWD"
 colcon build --symlink-install || {
     log_msg "Ошибка сборки colcon!"
     exit 1
