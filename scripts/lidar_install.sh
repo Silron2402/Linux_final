@@ -51,7 +51,8 @@ else
 fi
 
 # Параметры репозитория
-REPO_URL="https://github.com/Slamtec/rplidar_ros.git"  # Исправлен URL
+#git clone https://github.com/Slamtec/rplidar_ros.git -b ros2
+REPO_URL="https://github.com/Slamtec/rplidar_ros.git"  
 #рабочая директория
 REPO_DIR="$WORKSPACE_DIR/src/slamtec"
 
@@ -61,7 +62,7 @@ if [ -d "$REPO_DIR" ]; then
     cd "$REPO_DIR" && git pull
 else
     log_msg "Клонирование репозитория $REPO_URL..."
-    git clone "$REPO_URL" "$REPO_DIR"
+    git clone "$REPO_URL" "$REPO_DIR" -b ros2
 fi
 
 # Переход в корневую директорию workspace
