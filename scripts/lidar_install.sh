@@ -50,8 +50,8 @@ else
     log_msg "Пакет git уже установлен."
 fi
 
-# Клонирование репозиториев
-REPO_URL="https://github.com/Slamtec/rplidar_ros.git"
+# Параметры репозитория
+REPO_URL="https://github.com/Slamtec/rplidar_ros.git"  # Исправлен URL
 #рабочая директория
 REPO_DIR="$WORKSPACE_DIR/src/slamtec"
 
@@ -70,19 +70,55 @@ cd "$WORKSPACE_DIR" || {
     exit 1
 }
 
-#ros version
-DFF=$(ls /opt/ros)
+# Определение ROS_DISTRO (критическое исправление!)
+if [ -z "$ROS_DISTRO" ]; then
+    # Пытаемся определить дистрибутив по наличию директорий
+    ROS_DISTROS=$(ls /opt/ros 2>/dev/null | tail -1)
+    if [ -n "$ROS_DISTROS" ]; then
+        ROS_DISTRO="$ROS_DISTROS"
+        log_msg "Автоматически определён ROS_DISTRO=$ROS_DISTRO"
+    else
+        log_msg "Ошибка: не удалось определить ROS_DISTRO. Убедитесь, что ROS установлен и sourced."
+        exit 1
+    fi
+fi
 
-#Выполним сборку пакета с помощью команды:
-source /opt/ros/$DFF/setup.bash
+#Выполним сборку пакета 
+# Определяем путь к setup.bash
+ROS_SETUP="/opt/ros/$ROS_DISTRO/setup.bash"
 
+# Проверяем существование файла
+if [ ! -f "$ROS_SETUP" ]; then
+    log_msg "Ошибка: файл $ROS_SETUP не найден!"
+    exit 1
+fi
+
+# Применяем настройки в текущем окружении
+set +u #Отключим проверку обнаружения неопределенных переменных
+if source $ROS_SETUP; then
+    log_msg "Окружение ROS2 настроено успешно!"
+else
+    log_msg "Ошибка: не удалось выполнить source $ROS_SETUP"
+    exit 1
+fi
+set -u #Включим проверку обнаружения неопределенных переменных
 
 # Сборка workspace с помощью colcon
 log_msg "Сборка workspace с colcon..."
-colcon build --symlink-install
+colcon build --symlink-install || {
+    log_msg "Ошибка сборки colcon!"
+    exit 1
+}
 
 # Активация окружения
-source ./install/setup.bash
+set +u #Отключим проверку обнаружения неопределенных переменных
+if source ./install/setup.bash; then
+    log_msg "Окружение активировано успешно!"
+else
+    log_msg "Ошибка: не удалось выполнить активацию окружения"
+    exit 1
+fi
+set -u #Включим проверку обнаружения неопределенных переменных
 
 # Добавление постоянной активации в .bashrc
 if ! grep -q "source $WORKSPACE_DIR/install/setup.bash" ~/.bashrc; then
@@ -93,8 +129,18 @@ else
 fi
 
 # Перезагрузка .bashrc для текущего сеанса
+#применение изменений из файла .bashrc в текущей сессии терминала без его перезапуска
+set +u #Отключим проверку обнаружения неопределенных переменных
 source ~/.bashrc
+set -u #Включим проверку обнаружения неопределенных переменных
 
-log_msg "Скрипт успешно завершён!"
+# 2. Проверка наличия скомпилированных пакетов ROS
+if ! colcon list --base-paths "$WORKSPACE_DIR/src" --packages-select rplidar_ros &>/dev/null; then
+    log_msg "ОШИБКА: Пакет rplidar_ros не обнаружен в workspace!"
+    exit 1
+else
+    log_msg "✓ Пакет rplidar_ros успешно установлён!"
+    roslaunch rplidar_ros rplidar_c1.launch
+fi
 
-roslaunch rplidar_ros rplidar_c1.launch
+
