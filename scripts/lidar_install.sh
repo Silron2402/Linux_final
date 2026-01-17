@@ -138,7 +138,6 @@ if ! colcon list --base-paths "$WORKSPACE_DIR/src" --packages-select rplidar_ros
     exit 1
 else
     log_msg "✓ Пакет rplidar_ros успешно установлён!"
-    roslaunch rplidar_ros rplidar_c1.launch
 fi
 
 
