@@ -24,7 +24,7 @@ USER_HOME=$(getent passwd "$USERNAME" | cut -d: -f6)
 
 # Путь к установочной директории
 WORKSPACE_DIR="$USER_HOME/ros2_ws"
-WORK_DIR="$USER_HOME/lidar_slamtec"
+WORK_DIR="$USER_HOME/home/lidar_slamtec"
 
 #проверка интернет-соединения
 if ! ping -c 1 github.com &> /dev/null; then
