@@ -71,7 +71,7 @@ cd "$WORKSPACE_DIR" || {
 }
 
 #ros version
-DFF=$(rosversion -d)
+DFF=$(ls /opt/ros)
 
 #Выполним сборку пакета с помощью команды:
 source /opt/ros/$DFF/setup.bash
