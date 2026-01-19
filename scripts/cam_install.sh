@@ -72,7 +72,7 @@ if [ -d "$REPO_DIR" ]; then
     cd "$REPO_DIR" && git pull
 else
     log_msg "Клонирование репозитория $REPO_URL..."
-    git clone "$REPO_URL" "$REPO_DIR" -b ros2
+    git clone "$REPO_URL" "$REPO_DIR"
 fi
 
 # Переход в корневую директорию workspace
