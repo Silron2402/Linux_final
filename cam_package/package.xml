@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>cam_package</name>
+  <version>0.1.0</version>
+  <description>
+    ROS package to launch camera nodes with optional RVIZ/RQT.
+  </description>
+
+  <maintainer email="avataev@yandex.ru">Your Name</maintainer>
+  <license>MIT</license>
+
+  <!-- Зависимости для сборки -->
+  <build_depend>ament_cmake</build_depend>
+
+  <!-- Зависимости для выполнения -->
+  <exec_depend>rclcpp</exec_depend>
+  <exec_depend>rclpy</exec_depend>
+  <exec_depend>camera_info_manager</exec_depend>
+  <exec_depend>image_transport</exec_depend>
+  <exec_depend>rviz2</exec_depend>
+  <exec_depend>rqt</exec_depend>
+  <exec_depend>usb_cam</exec_depend>
+  <exec_depend>image_view</exec_depend>
+
+  <!-- Экспорт для ament (система сборки ROS 2) -->
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

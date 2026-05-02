@@ -254,13 +254,6 @@ exit 0
 #sudo systemctl restart ssh
 
 
-
-
-
-
-
-
-
 # Проверка SSH-подключения
 ssh -q -o BatchMode=yes -o StrictHostKeyChecking=no -i /path/to/your/key $_HOST 'exit 0'
 _RCODE=$?

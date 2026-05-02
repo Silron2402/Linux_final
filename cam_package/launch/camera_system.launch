@@ -1,0 +1,32 @@
+<launch>
+  <!-- Аргументы запуска -->
+  <arg name="rviz2" default="false" />
+  <arg name="rqt" default="false" />
+
+  <!-- Запуск узла камеры (пример: usb_cam) -->
+  <node pkg="usb_cam" type="usb_cam_node" name="usb_cam" output="screen">
+    <param name="video_device" value="/dev/video0" />
+    <param name="image_width" value="640" />
+    <param name="image_height" value="480" />
+    <param name="pixel_format" value="yuyv" />
+    <param name="camera_frame_id" value="camera_link" />
+  </node>
+
+  <!-- Трансляция изображений (если нужно) -->
+  <node pkg="image_transport" type="republish" name="republish_raw" args="raw in:=image_raw compressed out:=image_compressed" />
+
+  <!-- Запуск RVIZ, если rviz:=true -->
+  <group if="$(arg rviz2)">
+    <node pkg="rviz2" type="rviz2" name="rviz2" args="-d $(find camera_bringup)/rviz2/default.rviz" />
+  </group>
+
+  <!-- Запуск RQT, если rqt:=true -->
+  <group if="$(arg rqt)">
+    <node pkg="rqt_gui" type="rqt_gui" name="rqt_gui" />
+  </group>
+
+  <!-- Пример: запуск image_view для просмотра изображения -->
+  <node if="$(eval arg('rviz') == False and arg('rqt') == False)" 
+        pkg="image_view" type="image_view" name="image_viewer"
+        args="image:=/image_raw" />
+</launch>

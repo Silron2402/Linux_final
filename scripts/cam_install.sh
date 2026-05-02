@@ -159,10 +159,6 @@ else
     log_msg "✓ Пакет usb_cam_ros успешно установлён!"
 fi
 
-
-
-
-
 # Переход в корневую директорию workspace:
 cd ~/ros2_ws
 rosdep install --from-paths src --ignore-src -y
