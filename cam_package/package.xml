@@ -20,6 +20,7 @@
   <exec_depend>rviz2</exec_depend>
   <exec_depend>rqt</exec_depend>
   <exec_depend>usb_cam</exec_depend>
+  <exec_depend>mjpeg_cam</exec_depend>
   <exec_depend>image_view</exec_depend>
 
   <!-- Экспорт для ament (система сборки ROS 2) -->
