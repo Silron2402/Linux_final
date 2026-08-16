@@ -144,15 +144,15 @@ set +u #Отключим проверку обнаружения неопред�
 source ~/.bashrc
 set -u #Включим проверку обнаружения неопределенных переменных
 
-if ! ros2 pkg list | grep -q "mjpeg_cam"; then
-    log_msg "ОШИБКА: Пакет mjpeg_cam не найден в ROS2!"
+if ! ros2 pkg list | grep -q "mjpegcam_ros"; then
+    log_msg "ОШИБКА: Пакет mjpegcam_ros не найден в ROS2!"
     exit 1
 else
-    log_msg "✓ Пакет mjpeg_cam обнаружен в ROS2."
+    log_msg "✓ Пакет mjpegcam_ros обнаружен в ROS2."
 fi
 
 # 2. Проверка наличия скомпилированных пакетов ROS
-if ! colcon list --base-paths "$WORKSPACE_DIR/src" --packages-select mjpeg_cam &>/dev/null; then
+if ! colcon list --base-paths "$WORKSPACE_DIR/src" --packages-select mjpegcam_ros &>/dev/null; then
     log_msg "ОШИБКА: Пакет mjpeg_cam не обнаружен в workspace!"
     exit 1
 else
