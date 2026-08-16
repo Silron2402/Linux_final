@@ -162,12 +162,19 @@ else
     log_msg "✓ Пакет v4l2_camera успешно установлён!"
 fi
 
-# Переход в корневую директорию workspace:
-cd ~/ros2_ws
+# Переход в корневую директорию workspace
+cd "$WORKSPACE_DIR" || {
+    log_msg "Ошибка: не удалось перейти в $WORKSPACE_DIR!"
+    exit 1
+}
 rosdep install --from-paths src --ignore-src -y
 
 #Выполним сборку пакета с помощью команды:
-cd ~/ros2_ws
+# Переход в корневую директорию workspace
+cd "$WORKSPACE_DIR" || {
+    log_msg "Ошибка: не удалось перейти в $WORKSPACE_DIR!"
+    exit 1
+}
 colcon build
 
 # Выполним активацию окружения:
