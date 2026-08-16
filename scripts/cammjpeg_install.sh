@@ -29,7 +29,7 @@ WORKSPACE_DIR="$USER_HOME/ros2_ws"
 REPO_URL="https://gitlab.com/boldhearts/ros2_v4l2_camera.git"  
 
 #рабочая директория
-REPO_DIR="$WORKSPACE_DIR/src/v4la_camera"
+REPO_DIR="$WORKSPACE_DIR/src/v4l2_camera"
 
 #проверка интернет-соединения
 if ! ping -c 1 github.com &> /dev/null; then
