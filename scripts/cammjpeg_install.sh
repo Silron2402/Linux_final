@@ -1,97 +1,179 @@
-#!/usr/bin/env bash
+#!bin/bash
+
+#команды настройки выполнения скрипта установки драйверов лидара
+#прерывать скрипт при любой ошибке;
+#сообщение об ошибке при обнаружении неопределенных переменных
+#настройка пайпа возвращать код ошибки первой упавшей команды.
 set -eu -o pipefail
 
-log_msg() {
-    echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1"
-}
-
-is_package_installed() {
-    dpkg -s "$1" &>/dev/null
-}
-
+# Обработка прерывания скриптом (Ctrl+C)
 trap 'log_msg "Скрипт прерван пользователем"; exit 1' INT
 
-# Определяем пользователя: если через sudo — берём SUDO_USER, иначе текущего
-if [ -n "${SUDO_USER:-}" ]; then
-    USER_NAME="$SUDO_USER"
-else
-    USER_NAME="$(whoami)"
-fi
+#логирование с датой для отладки
+log_msg() { echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1"; }
 
-USER_HOME="$(getent passwd "$USER_NAME" | cut -d: -f6)"
+# Функция проверки установленного пакета
+is_package_installed() {
+    local package="$1"
+    dpkg -s "$package" &>/dev/null
+}
+
+#Получение имени пользователя и адреса домашнего каталога
+USER_HOME=$(getent passwd "$SUDO_USER" | cut -d: -f6)
+
+# Путь к установочной директории
 WORKSPACE_DIR="$USER_HOME/ros2_ws"
 
-if ! ping -c 1 github.com &>/dev/null; then
+# Параметры репозитория
+#git clone https://github.com/Slamtec/rplidar_ros.git -b ros2
+REPO_URL="https://gitlab.com/boldhearts/ros2_v4l2_camera.git"  
+
+#рабочая директория
+REPO_DIR="$WORKSPACE_DIR/src/v4la_camera"
+
+#проверка интернет-соединения
+if ! ping -c 1 github.com &> /dev/null; then
     log_msg "Отсутствует интернет‑соединение!"
     exit 1
 fi
 
-# Не требуем root для всего скрипта: sudo нужен только для apt
+#Проверка прав суперпользователя
+if [ "$(id -u)" != "0" ]; then
+    log_msg "Необходимо запустить скрипт от имени root или c sudo"
+    exit 1
+fi
+
+# Переход в директорию src рабочего пространства ROS 2
+cd "$WORKSPACE_DIR/src" || {
+    log_msg "Ошибка: директория $WORKSPACE_DIR/src не найдена!"
+    mkdir -p "$WORKSPACE_DIR/src"
+    if ! cd "$WORKSPACE_DIR/src"; then
+        log_msg "Ошибка: директория $WORKSPACE_DIR/src не была создана!"
+        exit 1
+    fi
+}
+
+# Переход в директорию src рабочего пространства ROS 2
+cd "$WORKSPACE_DIR/src" || {
+    log_msg "Ошибка: директория $WORKSPACE_DIR/src не найдена!"
+    exit 1
+}
+
+# Установка git (если не установлен)
 if ! is_package_installed git; then
     log_msg "Установка пакета git..."
-    sudo apt update
-    sudo apt install -y git
+    apt install -y git
 else
     log_msg "Пакет git уже установлен."
 fi
 
-mkdir -p "$WORKSPACE_DIR/src"
 
-REPO_URL="https://github.com/artificiell/rpi_cam_ros2.git"
-REPO_DIR="$WORKSPACE_DIR/src/mjpegcam_ros"
 
+#проверка существования репозитория
 if [ -d "$REPO_DIR" ]; then
-    log_msg "Репозиторий существует. Выполняем git pull..."
+    log_msg "Репозиторий существует. Выполняем обновление (git pull)..."
     cd "$REPO_DIR" && git pull
 else
     log_msg "Клонирование репозитория $REPO_URL..."
     git clone "$REPO_URL" "$REPO_DIR"
 fi
 
+# Переход в корневую директорию workspace
+cd "$WORKSPACE_DIR" || {
+    log_msg "Ошибка: не удалось перейти в $WORKSPACE_DIR!"
+    exit 1
+}
+
+# Определение ROS_DISTRO по наличию директорий
 ROS_DISTROS=$(ls /opt/ros 2>/dev/null | tail -1)
-if [ -z "$ROS_DISTROS" ]; then
-    log_msg "Ошибка: не удалось определить ROS_DISTRO. Убедитесь, что ROS установлен."
+if [ -n "$ROS_DISTROS" ]; then
+    ROS_DISTRO="$ROS_DISTROS"
+    log_msg "Автоматически определён ROS_DISTRO=$ROS_DISTRO"
+else
+    log_msg "Ошибка: не удалось определить ROS_DISTRO. Убедитесь, что ROS установлен и sourced."
     exit 1
 fi
-ROS_DISTRO="$ROS_DISTROS"
-log_msg "Автоматически определён ROS_DISTRO=$ROS_DISTRO"
 
+#Выполним сборку пакета 
+# Определяем путь к setup.bash
 ROS_SETUP="/opt/ros/$ROS_DISTRO/setup.bash"
+
+# Проверяем существование файла
 if [ ! -f "$ROS_SETUP" ]; then
     log_msg "Ошибка: файл $ROS_SETUP не найден!"
     exit 1
 fi
 
-source "$ROS_SETUP"
-log_msg "Окружение ROS2 настроено успешно!"
+# Применяем настройки в текущем окружении
+set +u #Отключим проверку обнаружения неопределенных переменных
+if source $ROS_SETUP; then
+    log_msg "Окружение ROS2 настроено успешно!"
+else
+    log_msg "Ошибка: не удалось выполнить source $ROS_SETUP"
+    exit 1
+fi
+set -u #Включим проверку обнаружения неопределенных переменных
 
-cd "$WORKSPACE_DIR"
 
-log_msg "Установка зависимостей через rosdep..."
-rosdep update
-rosdep install --from-paths src --ignore-src -y
-
+# Сборка workspace с помощью colcon
 log_msg "Сборка workspace с colcon..."
-colcon build --symlink-install
+log_msg "Мы находимся в директории $PWD"
+colcon build --symlink-install || {
+    log_msg "Ошибка сборки colcon!"
+    exit 1
+}
 
-source ./install/setup.bash
-log_msg "Окружение активировано успешно!"
+# Активация окружения
+set +u #Отключим проверку обнаружения неопределенных переменных
+if source ./install/setup.bash; then
+    log_msg "Окружение активировано успешно!"
+else
+    log_msg "Ошибка: не удалось выполнить активацию окружения"
+    exit 1
+fi
+set -u #Включим проверку обнаружения неопределенных переменных
 
-BASHRC_FILE="$USER_HOME/.bashrc"
-LINE_TO_ADD="source $WORKSPACE_DIR/install/setup.bash"
-
-if ! grep -qxF "$LINE_TO_ADD" "$BASHRC_FILE"; then
-    log_msg "Добавление настройки в $BASHRC_FILE..."
-    echo "$LINE_TO_ADD" >> "$BASHRC_FILE"
+# Добавление постоянной активации в .bashrc
+if ! grep -q "source $WORKSPACE_DIR/install/setup.bash" ~/.bashrc; then
+    log_msg "Добавление настройки в ~/.bashrc..."
+    echo "source $WORKSPACE_DIR/install/setup.bash" >> ~/.bashrc
 else
     log_msg "~/.bashrc уже содержит настройку окружения."
 fi
 
-if ros2 pkg executables | grep -q "^mjpeg_cam"; then
-    log_msg "✓ Пакет mjpeg_cam обнаружен в ROS2."
+# Перезагрузка .bashrc для текущего сеанса
+#применение изменений из файла .bashrc в текущей сессии терминала без его перезапуска
+set +u #Отключим проверку обнаружения неопределенных переменных
+source ~/.bashrc
+set -u #Включим проверку обнаружения неопределенных переменных
+
+# Проверка наличия пакета v4l2_camera
+if ros2 pkg list | grep -q "^v4l2_camera$"; then
+  log_msg "✓ Пакет v4l2_camera успешно собран и обнаружен."
 else
-    log_msg "ОШИБКА: Пакет mjpeg_cam не найден в ROS2! Проверьте package.xml и вывод сборки."
-    exit 1
+  log_msg "ОШИБКА: Пакет v4l2_camera не найден в ROS2!"
+  exit 1
 fi
 
-log_msg "Готово: пакет установлен и окружение настроено."
+# 2. Проверка наличия скомпилированных пакетов ROS
+if ! colcon list --base-paths "$WORKSPACE_DIR/src" --packages-select v4l2_camera &>/dev/null; then
+    log_msg "ОШИБКА: Пакет v4l2_camera не обнаружен в workspace!"
+    exit 1
+else
+    log_msg "✓ Пакет v4l2_camera успешно установлён!"
+fi
+
+# Переход в корневую директорию workspace:
+cd ~/ros2_ws
+rosdep install --from-paths src --ignore-src -y
+
+#Выполним сборку пакета с помощью команды:
+cd ~/ros2_ws
+colcon build
+
+# Выполним активацию окружения:
+source ./install/setup.bash
+
+#Для постоянного добавления в окружение введем команду:
+echo "source ~/ros2_ws/install/setup.bash" >> ~/.bashrc
+source ~/.bashrc
