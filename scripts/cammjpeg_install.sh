@@ -64,7 +64,7 @@ fi
 #git clone https://github.com/Slamtec/rplidar_ros.git -b ros2
 REPO_URL="https://github.com/artificiell/rpi_cam_ros2.git"  
 #рабочая директория
-REPO_DIR="$WORKSPACE_DIR/src/mjpegcam_ros"
+REPO_DIR="$WORKSPACE_DIR/src/mjpeg_cam"
 
 #проверка существования репозитория
 if [ -d "$REPO_DIR" ]; then
