@@ -8,8 +8,9 @@
     <param name="video_device" value="/dev/video0" />
     <param name="image_width" value="640" />
     <param name="image_height" value="480" />
-    <param name="pixel_format" value="yuyv" />
+    <param name="pixel_format" value="mjpeg2rgb" />
     <param name="camera_frame_id" value="camera_link" />
+    <!-- param name {'av_device_format': 'MJPG'} -->
   </node>
 
   <!-- Трансляция изображений (если нужно) -->
